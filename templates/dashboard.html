@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Legal Contract Dashboard</title>
+
+<link rel="stylesheet" href="/static/style.css">
+```
+
+</head>
+
+<body>
+
+```
+<!-- Sidebar -->
+
+<div class="sidebar">
+
+
+    <div class="logo">
+
+        ⚖️ Legal Contract
+
+    </div>
+
+
+    <!-- Navigation -->
+
+    <nav>
+
+        <a href="/dashboard" class="active">
+            🏠 Dashboard
+        </a>
+
+        <a href="#" id="contractsMenu">
+            📄 Contracts
+        </a>
+
+        <a href="#" id="documentsMenu">
+            📁 Documents
+        </a>
+
+        <a href="#" id="usersMenu">
+            👥 Users
+        </a>
+
+        <a href="#" id="rolesMenu">
+            🎭 Roles
+        </a>
+
+        <a href="#" id="approvalMenu">
+            ✅ Approval
+        </a>
+
+        <a href="/modifications-page">
+            📝 Modifications
+        </a>
+
+    </nav>
+
+    <!-- Logout -->
+
+    <div class="sidebar-bottom">
+
+        <a href="#" onclick="logout()">
+
+            🚪 Logout
+
+        </a>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- Main Content -->
+
+<div class="main-content">
+
+
+    <!-- Top Bar -->
+
+    <header class="topbar">
+
+
+        <div>
+
+            <h1>Dashboard</h1>
+
+            <p>
+                Legal Contract Document Modification System
+            </p>
+
+        </div>
+
+
+        <div class="user-info">
+
+
+            <div class="user-icon">
+
+                👤
+
+            </div>
+
+
+            <div>
+
+                <strong id="userName">
+                    User
+                </strong>
+
+                <span id="userRole">
+                    Role
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- Welcome Section -->
+
+    <section class="welcome">
+
+
+        <h2>
+            Welcome to Legal Contract System 👋
+        </h2>
+
+
+        <p>
+
+            Manage contracts, documents and
+            contract-related activities from one place.
+
+        </p>
+
+
+    </section>
+
+
+
+    <!-- Statistics -->
+
+    <section class="cards">
+
+
+        <!-- Total Contracts -->
+
+        <div class="card">
+
+
+            <div class="card-icon">
+
+                📄
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Total Contracts
+                </h3>
+
+
+                <p id="totalContracts">
+
+                    {{ total_contracts }}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- Draft Contracts -->
+
+        <div class="card">
+
+
+            <div class="card-icon">
+
+                📝
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Draft Contracts
+                </h3>
+
+
+                <p id="draftContracts">
+
+                    {{ draft_contracts }}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- Active Contracts -->
+
+        <div class="card">
+
+
+            <div class="card-icon">
+
+                ✅
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Active Contracts
+                </h3>
+
+
+                <p id="activeContracts">
+
+                    {{ active_contracts }}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- Total Documents -->
+
+        <div class="card">
+
+
+            <div class="card-icon">
+
+                📁
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Total Documents
+                </h3>
+
+
+                <p id="totalDocuments">
+
+                    {{ total_documents }}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- Quick Actions -->
+
+    <section class="quick-section">
+
+
+        <h2>
+            Quick Actions
+        </h2>
+
+
+        <div class="quick-actions">
+
+
+            <button
+                onclick="showMessage('Create Contract')">
+
+                ➕ Create Contract
+
+            </button>
+
+
+            <button
+                onclick="showMessage('Upload Document')">
+
+                📤 Upload Document
+
+            </button>
+
+
+            <button
+                onclick="showMessage('View Contracts')">
+
+                📋 View Contracts
+
+            </button>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- System Information -->
+
+    <section class="system-info">
+
+
+        <h2>
+            System Information
+        </h2>
+
+
+        <div class="info-box">
+
+
+            <p>
+
+                <strong>
+                    System:
+                </strong>
+
+                Legal Contract Document Modification System
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Backend:
+                </strong>
+
+                FastAPI
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Database:
+                </strong>
+
+                MySQL
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Authentication:
+                </strong>
+
+                JWT
+
+            </p>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+
+<!-- JavaScript -->
+
+<script>
+
+
+    // ==========================================
+    // CHECK LOGIN
+    // ==========================================
+
+    const token =
+        localStorage.getItem("access_token");
+
+
+    if (!token) {
+
+        window.location.href = "/login";
+
+    }
+
+
+
+    // ==========================================
+    // GET USER INFORMATION
+    // ==========================================
+
+    const userName =
+        localStorage.getItem("username");
+
+
+    const userRole =
+        localStorage.getItem("role");
+
+
+    const roleId =
+        localStorage.getItem("role_id");
+
+
+
+    // Display Username
+
+    if (userName) {
+
+        document
+            .getElementById("userName")
+            .textContent = userName;
+
+    }
+
+
+
+    // Display Role
+
+    if (userRole) {
+
+        document
+            .getElementById("userRole")
+            .textContent = userRole;
+
+    }
+
+
+
+    // ==========================================
+    // ROLE BASED NAVIGATION
+    // ==========================================
+
+
+    // Hide role-specific menus initially
+
+    document
+        .getElementById("usersMenu")
+        .style.display = "none";
+
+
+    document
+        .getElementById("rolesMenu")
+        .style.display = "none";
+
+
+    document
+        .getElementById("approvalMenu")
+        .style.display = "none";
+
+
+
+    // ==========================================
+    // ADMIN
+    // Role ID = 2
+    // ==========================================
+
+    if (roleId == "2") {
+
+
+        document
+            .getElementById("usersMenu")
+            .style.display = "block";
+
+
+        document
+            .getElementById("rolesMenu")
+            .style.display = "block";
+
+
+        document
+            .getElementById("approvalMenu")
+            .style.display = "block";
+
+    }
+
+
+
+    // ==========================================
+    // APPROVAL
+    // Role ID = 3
+    // ==========================================
+
+    else if (roleId == "3") {
+
+
+        document
+            .getElementById("approvalMenu")
+            .style.display = "block";
+
+    }
+
+
+
+    // ==========================================
+    // ROLE MANAGEMENT
+    // Role ID = 4
+    // ==========================================
+
+    else if (roleId == "4") {
+
+
+        document
+            .getElementById("usersMenu")
+            .style.display = "block";
+
+
+        document
+            .getElementById("rolesMenu")
+            .style.display = "block";
+
+    }
+
+
+
+    // ==========================================
+    // REVIEWER
+    // Role ID = 5
+    // ==========================================
+
+    else if (roleId == "5") {
+
+
+        // Reviewer gets:
+
+        // Dashboard
+        // Contracts
+        // Documents
+
+    }
+
+
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+
+    function logout() {
+
+
+        localStorage.removeItem(
+            "access_token"
+        );
+
+
+        localStorage.removeItem(
+            "username"
+        );
+
+
+        localStorage.removeItem(
+            "role"
+        );
+
+
+        localStorage.removeItem(
+            "role_id"
+        );
+
+
+        window.location.href =
+            "/login";
+
+    }
+
+
+
+    // ==========================================
+    // QUICK ACTION MESSAGE
+    // ==========================================
+
+    function showMessage(action) {
+
+
+        alert(
+            action +
+            " feature will be available here."
+        );
+
+    }
+
+
+</script>
+```
+
+</body>
+
+</html>

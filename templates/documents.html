@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Documents - Legal Contract System</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+
+        /* ==========================================
+           DOCUMENT PAGE
+        ========================================== */
+
+        .documents-container {
+            padding: 25px;
+        }
+
+        .document-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .document-toolbar h2 {
+            margin: 0;
+        }
+
+        .upload-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .upload-btn:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* ==========================================
+           FILTER
+        ========================================== */
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-section select {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            min-width: 280px;
+            background: white;
+            cursor: pointer;
+        }
+
+
+        /* ==========================================
+           TABLE
+        ========================================== */
+
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .document-table th,
+        .document-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .document-table th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+
+        .document-name {
+            font-weight: 600;
+        }
+
+        .file-path {
+            word-break: break-all;
+        }
+
+
+        /* ==========================================
+           VIEW BUTTON
+        ========================================== */
+
+        .view-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .view-btn:hover {
+            background: #15803d;
+        }
+
+
+        /* ==========================================
+           EMPTY MESSAGE
+        ========================================== */
+
+        .empty-message {
+            text-align: center;
+            padding: 25px;
+            color: #6b7280;
+        }
+
+
+        /* ==========================================
+           MODAL
+        ========================================== */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            width: 450px;
+            max-width: 90%;
+            margin: 8% auto;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+        /* ==========================================
+           MESSAGE
+        ========================================== */
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+
+        /* ==========================================
+           SIDEBAR FIX
+        ========================================== */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #172033;
+            color: white;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: left;
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 22px;
+            color: white;
+        }
+
+        .sidebar-header p {
+            margin: 4px 0 0;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+        }
+
+        .sidebar-menu li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-menu li a:hover {
+            background: rgba(255, 255, 255, 0.10);
+            color: white;
+        }
+
+        .sidebar-menu li.active a {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            right: 15px;
+        }
+
+        .sidebar-bottom button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #dc2626;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .sidebar-bottom button:hover {
+            background: #b91c1c;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==========================================
+     SIDEBAR
+========================================== -->
+
+<div class="sidebar">
+
+    <div class="sidebar-header">
+
+        <h2>Legal Contract</h2>
+
+        <p>Management System</p>
+
+    </div>
+
+
+    <ul class="sidebar-menu">
+
+        <!-- DASHBOARD -->
+
+        <li>
+
+            <a href="/dashboard">
+
+                🏠 Dashboard
+
+            </a>
+
+        </li>
+
+
+        <!-- CONTRACTS -->
+
+        <li>
+
+            <a href="/contracts-page">
+
+                📄 Contracts
+
+            </a>
+
+        </li>
+
+
+        <!-- DOCUMENTS -->
+
+        <li class="active">
+
+            <a href="/documents-page">
+
+                📁 Documents
+
+            </a>
+
+        </li>
+
+
+        <!-- USERS -->
+
+        <li
+            id="usersMenu"
+            style="display:none;">
+
+            <a href="#">
+
+                👥 Users
+
+            </a>
+
+        </li>
+
+
+        <!-- ROLES -->
+
+        <li
+            id="rolesMenu"
+            style="display:none;">
+
+            <a href="#">
+
+                🔐 Roles
+
+            </a>
+
+        </li>
+
+
+        <!-- APPROVAL -->
+
+        <li
+            id="approvalMenu"
+            style="display:none;">
+
+            <a href="#">
+
+                ✅ Approval
+
+            </a>
+
+        </li>
+
+    </ul>
+
+
+    <!-- LOGOUT -->
+
+    <div class="sidebar-bottom">
+
+        <button onclick="logout()">
+
+            🚪 Logout
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================
+     MAIN CONTENT
+========================================== -->
+
+<div class="main-content">
+
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div>
+
+            <h1>Documents</h1>
+
+            <p>
+                Manage contract documents
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <strong id="usernameDisplay">
+                User
+            </strong>
+
+            <span id="roleDisplay"></span>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- DOCUMENT CONTENT -->
+
+    <div class="documents-container">
+
+
+        <!-- TOOLBAR -->
+
+        <div class="document-toolbar">
+
+            <h2>
+                Document List
+            </h2>
+
+
+            <button
+                class="upload-btn"
+                onclick="openUploadModal()">
+
+                + Upload Document
+
+            </button>
+
+        </div>
+
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="message"
+            class="message">
+
+        </div>
+
+
+
+        <!-- CONTRACT FILTER -->
+
+        <div class="filter-section">
+
+            <select
+                id="contractFilter"
+                onchange="filterDocuments()">
+
+                <option value="">
+                    All Contracts
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- DOCUMENT TABLE -->
+
+        <table class="document-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>File Name</th>
+
+                    <th>File Path</th>
+
+                    <th>Contract ID</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="documentTableBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================
+     UPLOAD MODAL
+========================================== -->
+
+<div
+    id="uploadModal"
+    class="modal">
+
+
+    <div class="modal-content">
+
+
+        <h2>
+            Upload Document
+        </h2>
+
+
+        <form id="uploadForm">
+
+
+            <!-- CONTRACT -->
+
+            <div class="form-group">
+
+                <label>
+                    Select Contract
+                </label>
+
+
+                <select
+                    id="contractId"
+                    required>
+
+                    <option value="">
+                        Select Contract
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- FILE -->
+
+            <div class="form-group">
+
+                <label>
+                    Select Document
+                </label>
+
+
+                <input
+                    type="file"
+                    id="documentFile"
+                    required>
+
+            </div>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeUploadModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="submit-btn">
+
+                    Upload
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+// ==========================================
+// LOGIN PROTECTION
+// ==========================================
+
+const token =
+    localStorage.getItem("access_token");
+
+
+if (!token) {
+
+    window.location.href = "/login";
+
+}
+
+
+
+// ==========================================
+// USER INFORMATION
+// ==========================================
+
+const username =
+    localStorage.getItem("username")
+    || "User";
+
+
+const roleId =
+    localStorage.getItem("role_id");
+
+
+document.getElementById(
+    "usernameDisplay"
+).innerText = username;
+
+
+
+// ==========================================
+// ROLE BASED MENU
+// ==========================================
+
+if (roleId === "2") {
+
+    document.getElementById(
+        "usersMenu"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "rolesMenu"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "approvalMenu"
+    ).style.display = "block";
+
+}
+
+
+else if (roleId === "3") {
+
+    document.getElementById(
+        "approvalMenu"
+    ).style.display = "block";
+
+}
+
+
+else if (roleId === "4") {
+
+    document.getElementById(
+        "usersMenu"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "rolesMenu"
+    ).style.display = "block";
+
+}
+
+
+
+// ==========================================
+// LOAD CONTRACTS
+// ==========================================
+
+async function loadContracts() {
+
+    try {
+
+        const response =
+            await fetch("/contracts/");
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load contracts"
+            );
+
+        }
+
+
+        const contracts =
+            await response.json();
+
+
+        const uploadSelect =
+            document.getElementById(
+                "contractId"
+            );
+
+
+        const filterSelect =
+            document.getElementById(
+                "contractFilter"
+            );
+
+
+        uploadSelect.innerHTML = `
+
+            <option value="">
+                Select Contract
+            </option>
+
+        `;
+
+
+        filterSelect.innerHTML = `
+
+            <option value="">
+                All Contracts
+            </option>
+
+        `;
+
+
+        contracts.forEach(
+            contract => {
+
+
+                // Upload dropdown
+
+                const uploadOption =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                uploadOption.value =
+                    String(contract.id);
+
+
+                uploadOption.textContent =
+                    `${contract.id} - ${contract.title}`;
+
+
+                uploadSelect.appendChild(
+                    uploadOption
+                );
+
+
+
+                // Filter dropdown
+
+                const filterOption =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                filterOption.value =
+                    String(contract.id);
+
+
+                filterOption.textContent =
+                    `${contract.id} - ${contract.title}`;
+
+
+                filterSelect.appendChild(
+                    filterOption
+                );
+
+            }
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Error loading contracts:",
+            error
+        );
+
+    }
+
+}
+
+
+
+// ==========================================
+// LOAD DOCUMENTS
+// ==========================================
+
+async function loadDocuments(
+    selectedContractId = ""
+) {
+
+    try {
+
+        /*
+         * Get all documents
+         */
+
+        const response =
+            await fetch("/documents/");
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load documents"
+            );
+
+        }
+
+
+        const allDocuments =
+            await response.json();
+
+
+        /*
+         * Filter documents
+         */
+
+        let documents =
+            allDocuments;
+
+
+        if (selectedContractId !== "") {
+
+            documents =
+                allDocuments.filter(
+                    doc => {
+
+                        return String(
+                            doc.contract_id
+                        ) === String(
+                            selectedContractId
+                        );
+
+                    }
+                );
+
+        }
+
+
+
+        // ==================================
+        // TABLE
+        // ==================================
+
+        const tbody =
+            document.getElementById(
+                "documentTableBody"
+            );
+
+
+        tbody.innerHTML = "";
+
+
+
+        // ==================================
+        // NO DOCUMENTS
+        // ==================================
+
+        if (
+            !Array.isArray(documents) ||
+            documents.length === 0
+        ) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty-message">
+
+                        No documents found
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+
+        // ==================================
+        // DISPLAY DOCUMENTS
+        // ==================================
+
+        documents.forEach(
+            doc => {
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${doc.id}
+                    </td>
+
+
+                    <td class="document-name">
+                        ${doc.file_name}
+                    </td>
+
+
+                    <td class="file-path">
+                        ${doc.file_path}
+                    </td>
+
+
+                    <td>
+                        ${doc.contract_id}
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            class="view-btn"
+                            onclick="viewDocument('${doc.file_path}')">
+
+                            👁 View
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Error loading documents:",
+            error
+        );
+
+
+        const tbody =
+            document.getElementById(
+                "documentTableBody"
+            );
+
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    class="empty-message">
+
+                    Error loading documents
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+
+// ==========================================
+// FILTER DOCUMENTS
+// ==========================================
+
+function filterDocuments() {
+
+    const contractId =
+        document.getElementById(
+            "contractFilter"
+        ).value;
+
+
+    console.log(
+        "Selected Contract ID:",
+        contractId
+    );
+
+
+    loadDocuments(
+        contractId
+    );
+
+}
+
+
+
+// ==========================================
+// OPEN UPLOAD MODAL
+// ==========================================
+
+function openUploadModal() {
+
+    document.getElementById(
+        "uploadModal"
+    ).style.display =
+        "block";
+
+}
+
+
+
+// ==========================================
+// CLOSE UPLOAD MODAL
+// ==========================================
+
+function closeUploadModal() {
+
+    document.getElementById(
+        "uploadModal"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "uploadForm"
+    ).reset();
+
+}
+
+
+
+// ==========================================
+// UPLOAD DOCUMENT
+// ==========================================
+
+document.getElementById(
+    "uploadForm"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const contractId =
+            document.getElementById(
+                "contractId"
+            ).value;
+
+
+        const file =
+            document.getElementById(
+                "documentFile"
+            ).files[0];
+
+
+        if (
+            !contractId ||
+            !file
+        ) {
+
+            showMessage(
+                "Please select contract and document.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/documents/upload?contract_id=${contractId}`,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                showMessage(
+                    result.detail ||
+                    "Document upload failed.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            showMessage(
+                "Document uploaded successfully!",
+                "success"
+            );
+
+
+            closeUploadModal();
+
+
+            /*
+             * Keep currently selected filter
+             */
+
+            const currentFilter =
+                document.getElementById(
+                    "contractFilter"
+                ).value;
+
+
+            await loadDocuments(
+                currentFilter
+            );
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Upload error:",
+                error
+            );
+
+
+            showMessage(
+                "Error uploading document.",
+                "error"
+            );
+
+        }
+
+    }
+);
+
+
+
+// ==========================================
+// VIEW DOCUMENT
+// ==========================================
+
+// function viewDocument(
+//     filePath
+// ) {
+
+//     alert(
+//         "Document Path:\n\n" +
+//         filePath
+//     );
+
+// }
+function viewDocument(filePath) {
+
+    // Remove "uploads\" or "uploads/"
+    const fileName = filePath
+        .replace(/^uploads[\\\/]/, "");
+
+    // Encode filename safely
+    const fileUrl =
+        "/uploads/" +
+        encodeURIComponent(fileName);
+
+    console.log("Opening:", fileUrl);
+
+    window.open(
+        fileUrl,
+        "_blank"
+    );
+}
+
+
+
+// ==========================================
+// SHOW MESSAGE
+// ==========================================
+
+function showMessage(
+    message,
+    type
+) {
+
+    const element =
+        document.getElementById(
+            "message"
+        );
+
+
+    element.innerText =
+        message;
+
+
+    element.className =
+        "message " + type;
+
+
+    element.style.display =
+        "block";
+
+
+    setTimeout(
+        function() {
+
+            element.style.display =
+                "none";
+
+        },
+        3000
+    );
+
+}
+
+
+
+// ==========================================
+// LOGOUT
+// ==========================================
+
+function logout() {
+
+    localStorage.removeItem(
+        "access_token"
+    );
+
+
+    localStorage.removeItem(
+        "username"
+    );
+
+
+    localStorage.removeItem(
+        "role_id"
+    );
+
+
+    localStorage.removeItem(
+        "role"
+    );
+
+
+    window.location.href =
+        "/login";
+
+}
+
+
+
+// ==========================================
+// INITIAL PAGE LOAD
+// ==========================================
+
+loadContracts()
+    .then(
+        () => {
+
+            loadDocuments();
+
+        }
+    );
+
+
+</script>
+
+</body>
+
+</html>

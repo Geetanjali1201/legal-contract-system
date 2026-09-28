@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Approvals - Legal Contract System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100vh;
+            background: #1f2937;
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #374151;
+        }
+
+        .logout {
+            margin-top: 30px;
+            background: #dc2626;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+        }
+
+        .user-info {
+            background: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn {
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .approve-btn {
+            background: #16a34a;
+        }
+
+        .reject-btn {
+            background: #dc2626;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        <h2>Legal Contract</h2>
+
+        <a href="/dashboard">Dashboard</a>
+
+        <a href="/contracts-page">Contracts</a>
+
+        <a href="/documents-page">Documents</a>
+
+        <a href="/users-page" id="usersMenu">Users</a>
+
+        <a href="/roles-page" id="rolesMenu">Roles</a>
+
+        <a href="/approval-page" class="active" id="approvalMenu">
+            Approval
+        </a>
+
+        <a href="#" class="logout" onclick="logout()">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <div class="topbar">
+
+            <h1>Approval Management</h1>
+
+            <div class="user-info">
+                <span id="username">User</span>
+                |
+                <span id="role">Role</span>
+            </div>
+
+        </div>
+
+
+        <div id="message" class="message"></div>
+
+
+        <div class="card">
+
+            <h2>Approval Requests</h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Contract ID</th>
+                            <th>Status</th>
+                            <th>Comments</th>
+                            <th>Approved By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="approvalTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // Check login
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+            window.location.href = "/login";
+        }
+
+
+        // User information
+        const username = localStorage.getItem("username");
+        const roleId = parseInt(localStorage.getItem("role_id"));
+
+
+        document.getElementById("username").textContent =
+            username || "User";
+
+
+        const roleNames = {
+            2: "Admin",
+            3: "Approval",
+            4: "Role Management",
+            5: "Reviewer"
+        };
+
+
+        document.getElementById("role").textContent =
+            roleNames[roleId] || "User";
+
+
+        // Role based menu
+        if (roleId !== 2 && roleId !== 4) {
+            document.getElementById("usersMenu").style.display = "none";
+            document.getElementById("rolesMenu").style.display = "none";
+        }
+
+
+        // Load approvals
+        async function loadApprovals() {
+
+            try {
+
+                const response = await fetch("/approvals/", {
+
+                    method: "GET",
+
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+
+                });
+
+
+                if (response.status === 401) {
+
+                    localStorage.clear();
+
+                    window.location.href = "/login";
+
+                    return;
+                }
+
+
+                if (!response.ok) {
+
+                    showMessage(
+                        "Failed to load approvals.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                const approvals = await response.json();
+
+
+                const table =
+                    document.getElementById("approvalTable");
+
+
+                table.innerHTML = "";
+
+
+                if (approvals.length === 0) {
+
+                    table.innerHTML = `
+                        <tr>
+                            <td colspan="6"
+                                style="text-align:center;">
+                                No approval requests found.
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+                }
+
+
+                approvals.forEach(approval => {
+
+                    let statusClass =
+                        approval.status.toLowerCase();
+
+
+                    let actionButtons = "";
+
+
+                    // Only Admin and Approval roles
+                    // can approve/reject
+                    if (
+                        (roleId === 2 || roleId === 3) &&
+                        approval.status === "Pending"
+                    ) {
+
+                        actionButtons = `
+                            <button
+                                class="btn approve-btn"
+                                onclick="updateApproval(
+                                    ${approval.id},
+                                    'Approved'
+                                )">
+                                Approve
+                            </button>
+
+                            <button
+                                class="btn reject-btn"
+                                onclick="updateApproval(
+                                    ${approval.id},
+                                    'Rejected'
+                                )">
+                                Reject
+                            </button>
+                        `;
+
+                    } else {
+
+                        actionButtons = "-";
+
+                    }
+
+
+                    table.innerHTML += `
+
+                        <tr>
+
+                            <td>${approval.id}</td>
+
+                            <td>${approval.contract_id}</td>
+
+                            <td>
+                                <span
+                                    class="status ${statusClass}">
+                                    ${approval.status}
+                                </span>
+                            </td>
+
+                            <td>
+                                ${approval.comments || "-"}
+                            </td>
+
+                            <td>
+                                ${approval.approved_by || "-"}
+                            </td>
+
+                            <td>
+                                ${actionButtons}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "Server connection error.",
+                    "error"
+                );
+
+            }
+
+        }
+
+
+        // Approve / Reject
+        async function updateApproval(
+            approvalId,
+            status
+        ) {
+
+            let comments =
+                status === "Approved"
+                    ? "Contract approved successfully"
+                    : "Contract rejected";
+
+
+            const confirmed = confirm(
+                "Are you sure you want to " +
+                status.toLowerCase() +
+                " this approval?"
+            );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            try {
+
+                const response = await fetch(
+                    `/approvals/${approvalId}`,
+                    {
+
+                        method: "PUT",
+
+                        headers: {
+
+                            "Authorization":
+                                "Bearer " + token,
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body: JSON.stringify({
+
+                            status: status,
+
+                            comments: comments
+
+                        })
+
+                    }
+                );
+
+
+                if (response.status === 401) {
+
+                    localStorage.clear();
+
+                    window.location.href = "/login";
+
+                    return;
+                }
+
+
+                if (response.status === 403) {
+
+                    showMessage(
+                        "You do not have permission.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                if (!response.ok) {
+
+                    const errorData =
+                        await response.json();
+
+                    showMessage(
+                        errorData.detail ||
+                        "Failed to update approval.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                showMessage(
+                    "Approval " +
+                    status.toLowerCase() +
+                    " successfully!",
+                    "success"
+                );
+
+
+                loadApprovals();
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "Server connection error.",
+                    "error"
+                );
+
+            }
+
+        }
+
+
+        // Message
+        function showMessage(
+            text,
+            type
+        ) {
+
+            const message =
+                document.getElementById("message");
+
+
+            message.textContent = text;
+
+            message.className =
+                "message " + type;
+
+            message.style.display = "block";
+
+
+            setTimeout(() => {
+
+                message.style.display = "none";
+
+            }, 3000);
+
+        }
+
+
+        // Logout
+        function logout() {
+
+            localStorage.clear();
+
+            window.location.href = "/login";
+
+        }
+
+
+        // Initial load
+        loadApprovals();
+
+    </script>
+
+</body>
+
+</html>

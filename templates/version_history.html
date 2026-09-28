@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Version History</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #374151;
+        }
+
+        .logout {
+            margin-top: 25px;
+            background: #dc2626 !important;
+            text-align: center;
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        /* Search box */
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .search-box label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-row input {
+            width: 250px;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+        .search-row button {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        .search-row button:hover {
+            background: #1d4ed8;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            color: #374151;
+        }
+
+        td {
+            color: #4b5563;
+        }
+
+        .version-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        <h2>Legal Contract</h2>
+
+        <a href="/dashboard">🏠 Dashboard</a>
+
+        <a href="/contracts-page">📄 Contracts</a>
+
+        <a href="/documents-page">📁 Documents</a>
+
+        <a href="/users-page" id="usersLink">👥 Users</a>
+
+        <a href="/roles-page" id="rolesLink">🔐 Roles</a>
+
+        <a href="/approval-page">✅ Approval</a>
+
+        <a href="/modifications-page">📝 Modifications</a>
+
+        <a href="/version-history-page" class="active">
+            🔄 Version History
+        </a>
+
+        <a href="/audit-logs-page">
+            📋 Audit Logs
+        </a>
+
+        <a href="#" class="logout" onclick="logout()">
+            🚪 Logout
+        </a>
+
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <div class="header">
+
+            <h1>Version History</h1>
+
+            <p>
+                View all versions and modification history of a contract.
+            </p>
+
+        </div>
+
+
+        <!-- Messages -->
+        <div id="message" class="message"></div>
+
+
+        <!-- Search -->
+        <div class="search-box">
+
+            <label for="contractId">
+                Enter Contract ID
+            </label>
+
+            <div class="search-row">
+
+                <input
+                    type="number"
+                    id="contractId"
+                    placeholder="Example: 1"
+                    min="1"
+                >
+
+                <button onclick="loadVersions()">
+                    Search Versions
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Table -->
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Version</th>
+                        <th>Contract ID</th>
+                        <th>Changes</th>
+                        <th>Created By</th>
+                        <th>File</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="versionTable">
+
+                    <tr>
+                        <td colspan="5" class="empty">
+                            Enter a Contract ID to view version history.
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const token = localStorage.getItem("access_token");
+
+        const roleId = localStorage.getItem("role_id");
+
+
+        // Login check
+        if (!token) {
+            window.location.href = "/login";
+        }
+
+
+        // Users and Roles are only visible
+        // to Admin and Role Management
+        if (roleId !== "2" && roleId !== "4") {
+
+            document.getElementById("usersLink").style.display = "none";
+
+            document.getElementById("rolesLink").style.display = "none";
+
+        }
+
+
+        async function loadVersions() {
+
+            const contractId =
+                document.getElementById("contractId").value;
+
+            const table =
+                document.getElementById("versionTable");
+
+            if (!contractId) {
+
+                showMessage(
+                    "Please enter a Contract ID.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty">
+                        Loading version history...
+                    </td>
+                </tr>
+            `;
+
+
+            try {
+
+                const response = await fetch(
+                    `/versions/contract/${contractId}`,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+                if (response.status === 401) {
+
+                    localStorage.clear();
+
+                    window.location.href = "/login";
+
+                    return;
+                }
+
+
+                if (!response.ok) {
+
+                    const errorData =
+                        await response.json();
+
+                    throw new Error(
+                        errorData.detail ||
+                        "Failed to load versions."
+                    );
+                }
+
+
+                const versions =
+                    await response.json();
+
+
+                if (versions.length === 0) {
+
+                    table.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="empty">
+                                No versions found for this contract.
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+                }
+
+
+                table.innerHTML = "";
+
+
+                versions.forEach(version => {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            <span class="version-badge">
+                                Version ${version.version_number}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${version.contract_id}
+                        </td>
+
+                        <td>
+                            ${
+                                version.changes ||
+                                "No changes recorded"
+                            }
+                        </td>
+
+                        <td>
+                            User ID:
+                            ${version.created_by}
+                        </td>
+
+                        <td>
+
+                            ${
+                                version.file_path
+                                ?
+                                `<a
+                                    href="${version.file_path}"
+                                    target="_blank">
+                                    View File
+                                </a>`
+                                :
+                                "No file"
+                            }
+
+                        </td>
+
+                    `;
+
+
+                    table.appendChild(row);
+
+                });
+
+
+                showMessage(
+                    "Version history loaded successfully.",
+                    "success"
+                );
+
+            }
+
+            catch (error) {
+
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty">
+                            Unable to load version history.
+                        </td>
+                    </tr>
+                `;
+
+                showMessage(
+                    error.message,
+                    "error"
+                );
+            }
+
+        }
+
+
+        function showMessage(text, type) {
+
+            const message =
+                document.getElementById("message");
+
+            message.textContent = text;
+
+            message.className =
+                `message ${type}`;
+
+            message.style.display = "block";
+
+        }
+
+
+        function logout() {
+
+            localStorage.removeItem("access_token");
+
+            localStorage.removeItem("username");
+
+            localStorage.removeItem("role_id");
+
+            window.location.href = "/login";
+
+        }
+
+    </script>
+
+</body>
+</html>

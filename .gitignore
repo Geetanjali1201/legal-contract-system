@@ -1,0 +1,22 @@
+# Virtual Environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Uploaded files
+uploads/*
+
+# VS Code
+.vscode/
+
+# SQLite database (if created)
+*.db
+
+# Python logs
+*.log
